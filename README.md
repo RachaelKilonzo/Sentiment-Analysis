@@ -17,10 +17,10 @@ Libraries used were: RWeka, memery, ggimage, magick, tidyverse, tm, wordcloud, w
 
 ##
 ## Word Cloud of the most frequent words.
-![3](https://user-images.githubusercontent.com/93233240/145233053-869ff087-b357-4d09-9672-f00fba14f661.png)
+![4](https://user-images.githubusercontent.com/93233240/145253323-18d33381-3111-4479-a6af-8464b2ca2b59.png)
+
 
 A bit of data cleaning was done to remove duplicates and align the capitalization of characters
-
 ##
 ## Text Mining
 A bunch of functions are applied to remove punctuation, extra white space, make all characters lower case, remove numbers and remove common English words called stopwords. 
@@ -40,9 +40,7 @@ The Bing Lexicon categorizes the words into a binary fashion of either positives
 Variations of the root word kill (killed, kill and killing), death (die, death, dies) and wrong are predominant as the most popular negative words while right, like, well and good are the most popular positive words. This is correlation to the archetypes of the storyline. The questions on right and wrong actions in relation to human life. Death and murder as commited by Light.
 ### NRC Lexicon
 The nrc lexicon groups the words in 10 moods:positive, negative, anger, anticipation, disgust, fear, joy, sadness, surprise, trust.
-
+![3](https://user-images.githubusercontent.com/93233240/145233053-869ff087-b357-4d09-9672-f00fba14f661.png)
 The positive and negative are the most prevalent moods. Additionally, there is also a lot of fear trust and anticipation in the anime.
-
-![4](https://user-images.githubusercontent.com/93233240/145253323-18d33381-3111-4479-a6af-8464b2ca2b59.png)
 
 

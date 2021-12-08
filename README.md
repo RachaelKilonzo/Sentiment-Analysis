@@ -24,7 +24,7 @@ This predefined function is going to clean the text from:
 
 ##
 ## Charty Characters.
-![alt text](https://github.com/RachaelKilonzo/Death-Note/blob/main/Image%20Files/1.pdf)
+![1](https://user-images.githubusercontent.com/93233240/145224154-ce20ad9c-7706-451c-b868-849eca5eafe7.png)
 
 ##
 ## Bigrams and Trigrams

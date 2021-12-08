@@ -15,4 +15,16 @@ I would early on like to pay my tribute to:
 ## Libraries
 Libraries used were: RWeka, memery, ggimage, magick, tidyverse, tm, wordcloud, wordcloud2, tidytext, reshape2, knitr, gridExtra, magick, memery, ggimage, igraph, ggraph, syuzhet, textdata, stringr, readxl, tidyr.
 
+A bit of data cleaning was done to remove duplicates and align the capitalization of characters.
+
+##
+## Text Mining
+A bunch of functions are applied to remove punctuation, extra white space, make all characters lower case, remove numbers and remove common English words called stopwords. 
+This predefined function is going to clean the text from:
+
+##
+## Charty Characters.
+
+##
+## Bigrams and Trigrams
 

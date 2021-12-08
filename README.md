@@ -7,7 +7,8 @@ Despite not being an avid fan of anime in comparison to Webtoons or Manhuas or e
 
 I would early on like to pay my tribute to:
 - **Inspiration:** This is heavily inspired by Xaviers work analysing the sentiments on [Star Wars](https://www.kaggle.com/xvivancos/analyzing-star-wars-movie-scripts) data set
--  **Data Source:** I went through the tedious process of scraping the transcripts from [Anime de English](https://anime-de-english.com/category/transcripts/) and making them slightly intelligible. 
+- **Data Source:** I went through the tedious process of scraping the transcripts from [Anime de English](https://anime-de-english.com/category/transcripts/) and making them slightly intelligible. 
+- **Author and illustratoe:**  Tsugumi Ohba and Takeshi Obata whose sheer imagination and artistic skill created one of the most iconic manga and anime series. 
 ![8Vg1s0v](https://user-images.githubusercontent.com/93233240/138996937-4fc952d7-972f-44a4-b38e-613f0f8639e7.jpg)
 
 

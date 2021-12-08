@@ -35,7 +35,9 @@ The Bing Lexicon categorizes the words into a binary fashion of either positives
 ![2](https://user-images.githubusercontent.com/93233240/145231207-79e241cc-cd46-4118-8440-4777e14dbd78.png)
 Variations of the root word kill (killed, kill and killing), death (die, death, dies) and wrong are predominant as the most popular negative words while right, like, well and good are the most popular positive words. This is correlation to the archetypes of the storyline. The questions on right and wrong actions in relation to human life. Death and murder as commited by Light.
 ### NRC Lexicon
+The nrc lexicon groups the words in 10 moods:positive, negative, anger, anticipation, disgust, fear, joy, sadness, surprise, trust.
 
 ![3](https://user-images.githubusercontent.com/93233240/145233053-869ff087-b357-4d09-9672-f00fba14f661.png)
+The positive and negative are the most prevalent. Additionally, there is also a lot of fear trust and anticipation in the anime.
 
 

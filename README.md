@@ -11,4 +11,8 @@ I would early on like to pay my tribute to:
 - **Author and illustratoe:**  Tsugumi Ohba and Takeshi Obata whose sheer imagination and artistic skill created one of the most iconic manga and anime series. 
 ![8Vg1s0v](https://user-images.githubusercontent.com/93233240/138996937-4fc952d7-972f-44a4-b38e-613f0f8639e7.jpg)
 
+##
+## Libraries
+Libraries used were: RWeka, memery, ggimage, magick, tidyverse, tm, wordcloud, wordcloud2, tidytext, reshape2, knitr, gridExtra, magick, memery, ggimage, igraph, ggraph, syuzhet, textdata, stringr, readxl, tidyr.
+
 

@@ -37,9 +37,17 @@ The nrc lexicon groups the words in 10 moods:positive, negative, anger, anticipa
 ![3](https://user-images.githubusercontent.com/93233240/145233053-869ff087-b357-4d09-9672-f00fba14f661.png)
 The positive and negative are the most prevalent moods. Additionally, there is also a lot of fear trust and anticipation in the anime.
 
+## AFINN Lexicon
+Afinn Lexicon ranks every word from -5 to 5, where:
+- -5 being the most negative
+- +5 being the most positive
+
+![6](https://user-images.githubusercontent.com/93233240/145258731-2911018b-d859-4dfc-ba6c-4c0e09eda293.png)
+This is the word count distribution over the intensity of sentiments
 ## Bigram Networks
 For the purpose of visualizing a connection between the words. The most interesting connection is that Kira is linked to the hubs Light, catch, Kill and real.
 Obvious combinations are: FBI and Agent, Cell and Phone, death and note, Light and Yagami. Sakura and TV e.t.c.
 
 ![5](https://user-images.githubusercontent.com/93233240/145255851-cd9c1d72-6de8-4d47-9f68-6febecc1da32.png)
 
+More diagrams and code can be viewed above and suggestions are welcomed.

@@ -25,7 +25,9 @@ This predefined function is going to clean the text from:
 ##
 ## Charty Characters.
 ![1](https://user-images.githubusercontent.com/93233240/145224154-ce20ad9c-7706-451c-b868-849eca5eafe7.png)
-
+- **Light and L** as expected have the largest percentage of dialogue in the anime. They are the main characters. An antagonist and protagonist
+- **Misa, Soichiro, Matsuda and Ryuk** come in as the second most talkative group.
+- **Aizawa, Near, Higuchi and Rem** rounding up the 10 most talkative characters.
 ##
 ## Bigrams and Trigrams
 

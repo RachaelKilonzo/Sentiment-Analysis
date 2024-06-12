@@ -6,7 +6,7 @@ Despite not being an avid fan of anime in comparison to Webtoons or Manhuas or e
 
 The choice for this project is based on:
 - **Inspiration:** This is heavily inspired by Xaviers work analysing the sentiments on [Star Wars](https://www.kaggle.com/xvivancos/analyzing-star-wars-movie-scripts) data set
-- **Data Source:** I went through the tedious process of scraping the transcripts from [Anime de English](https://anime-de-english.com/category/transcripts/) and making them slightly intelligible. Some Webscrapping was also done to get transcripts from [Death Note's fandom (https://deathnote.fandom.com/wiki/Death_Note_(anime)/List_of_Episodes/)]
+- **Data Source:** I went through the tedious process of scraping the transcripts from [Anime de English](https://anime-de-english.com/category/transcripts/) and making them slightly intelligible. Some Webscrapping was also done to get transcripts from [Death Note's fandom](https://deathnote.fandom.com/wiki/Death_Note_(anime)/List_of_Episodes/)
 - **Author and illustrator:**  Tsugumi Ohba and Takeshi Obata whose sheer imagination and artistic skill created one of the most iconic manga and anime series. 
 ![8Vg1s0v](https://user-images.githubusercontent.com/93233240/138996937-4fc952d7-972f-44a4-b38e-613f0f8639e7.jpg)
 

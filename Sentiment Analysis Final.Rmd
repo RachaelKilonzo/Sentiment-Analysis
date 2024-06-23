@@ -6,316 +6,696 @@ output:
   github_document:
     df_print: paged
 ---
+
+
+install libraries
+
+
 ```{r}
-# Load libraries
+
+#install.packages("rJava")
+#install.packages("qdap")
 #install.packages("RWeka") 
 #install.packages("memery")
-#install.packages("ggimage") 
+#install.packages("ggimage")
+
 #install.packages("magick")
 #install.packages("tidyverse")
 #install.packages("tm")
 #install.packages("wordcloud")
-#install.packages("wordcloud2")
+#install.packages("webshot2")
+
 #install.packages("tidytext")
 #install.packages("reshape2")
 #install.packages("knitr")
 #install.packages("gridExtra")
-#install.packages("magick")
-#install.packages("memery")
-#install.packages("ggimage")
 #install.packages("igraph")
+
 #install.packages("ggraph")
 #install.packages("syuzhet")
 #install.packages("textdata")
-#install.packages("stringr")
 #install.packages("readxl")
 #install.packages("tidyr")
-library(qdap)
-library(tidyr)
-library(data.table)
+
+#install.packages("htmlwidgets")
+#install.packages("webshot")
+
+```
+
+
+Load the libraries
+
+
+```{r}
+
 library(rJava)
-library(readxl)
-library(stringr)
-library(tidyverse) 
-library(tm) 
-library(wordcloud)
-library(tidytext) 
-library(reshape2) 
-library(RWeka) 
-library(knitr) 
-library(gridExtra) 
-library(grid) 
+library(qdap)
+library(RWeka)
+library(memery)
+library(ggimage)
+
 library(magick) 
-library(memery) 
-library(ggimage) 
-library(igraph) 
+library(tidyverse)
+library(tm)
+library(wordcloud)
+library(webshot2)
+
+library(tidytext)
+library(reshape2) 
+library(knitr) 
+library(gridExtra)
+library(igraph)
+
 library(ggraph)
 library(syuzhet)
 library(textdata)
+library(readxl)
+library(tidyr)
+
+library(htmlwidgets)
+library(webshot)
+
+library(data.table)
+library(stringr)
+library(grid) 
 library(dplyr)
 library(RColorBrewer)
 library(usethis)
 library(devtools)
-library(wordcloud2)
 library(extrafont)
-Sys.setenv(JAVA_HOME='C:\\Program Files\\Java\\jre1.8.0_301')
-devtools::install_github("lchiffon/wordcloud2")
 
-scripts=read_excel("C:/Users/Rachael/Desktop/Projects/Death Note.xlsx")
-head(scripts)
+```
+
+
+
+
+
+```{r}
+
+Sys.setenv(JAVA_HOME='C:/Program Files/Java/jdk-22')
+
+```
+
+
+
+
+
+```{r}
+
+#devtools::install_github("lchiffon/wordcloud2", force = TRUE)
+#library(wordcloud2)
+
+#webshot::install_phantomjs()
+system("phantomjs --version")
+
+```
+
+
+
+
+
+```{r}
+
 bing = get_sentiments("bing")
 nrc = get_sentiments("nrc") 
 afinn = get_sentiments("afinn")
 
 ```
-Some data cleaning
+
+
+Import the joint transcript
+
+
 ```{r}
-scripts$Character.Name=str_trim(scripts$Character.Name)
-scripts$Episode.Name=str_trim(scripts$Episode.Name)
-scripts$Dialog=str_trim(scripts$Dialog)
-scripts$Character.Name=str_to_title(scripts$Character.Name)
-scripts$Episode.Name=str_to_title(scripts$Episode.Name)
-scripts$Dialog =gsub("[\u2018\u2019\u201A\u201B\u2032\u2035]", "'", scripts$Dialog)
-scripts$Character.Name = gsub("[\u2018\u2019\u201A\u201B\u2032\u2035]", "'", scripts$Character.Name)
-count(scripts,Character.Name,sort = FALSE)
-count(scripts,Episode.Name,sort = FALSE)
-count(scripts,Episode.No,sort = FALSE)
+
+scripts=read.csv("C:/Users/PC/Desktop/Portfolio/Sentiment Analysis/DeathNoteTranscripts.csv", header = TRUE, sep = ",")
+
 head(scripts)
+
 ```
+
+
+Import all the episodes individually
+
+
+```{r}
+
+confrontation=read.csv("C:/Users/PC/Desktop/Portfolio/Sentiment Analysis/confrontation.csv", header = TRUE, sep = ",")
+
+dealings=read.csv("C:/Users/PC/Desktop/Portfolio/Sentiment Analysis/dealings.csv", header = TRUE, sep = ",")
+
+glare=read.csv("C:/Users/PC/Desktop/Portfolio/Sentiment Analysis/glare.csv", header = TRUE, sep = ",")
+
+overcast=read.csv("C:/Users/PC/Desktop/Portfolio/Sentiment Analysis/overcast.csv", header = TRUE, sep = ",")
+
+pursuit=read.csv("C:/Users/PC/Desktop/Portfolio/Sentiment Analysis/pursuit.csv", header = TRUE, sep = ",")
+
+rebirth=read.csv("C:/Users/PC/Desktop/Portfolio/Sentiment Analysis/rebirth.csv", header = TRUE, sep = ",")
+
+tactics=read.csv("C:/Users/PC/Desktop/Portfolio/Sentiment Analysis/tactics.csv", header = TRUE, sep = ",")
+
+unraveling=read.csv("C:/Users/PC/Desktop/Portfolio/Sentiment Analysis/unraveling.csv", header = TRUE, sep = ",")
+
+```
+
+
+Some data cleaning
+
+
+```{r}
+
+# Remove rows where Character is empty it is often either a voice-over or a narrator
+scripts = scripts %>%
+  filter(Characters!= "")
+
+# Remove rows where Dialogue is empty it is often either a voice-over or a narrator
+scripts = scripts %>%
+  filter(Dialogue!= "")
+
+```
+
+
+
+
+
+```{r}
+
+# Convert values in Character column to title case
+scripts$Characters = str_to_title(scripts$Character)
+
+# Convert values in Episode.Name column to title case
+scripts$Episode.Name=str_to_title(scripts$Episode.Name)
+
+```
+
+
+
+
+
+```{r}
+
+# Replace special quotation marks with standard apostrophe in the Dialog column
+scripts$Dialogue = gsub("[\u2018\u2019\u201A\u201B\u2032\u2035]", "'", scripts$Dialogue)
+
+# Replace special quotation marks with standard apostrophe in the Character.Name column
+scripts$Characters = gsub("[\u2018\u2019\u201A\u201B\u2032\u2035]", "'", scripts$Characters)
+
+```
+
+
+
+
+```{r}
+
+# Remove quotation marks and extra information from Characters column
+scripts$Characters = gsub("[\"']", "", scripts$Characters)  # Remove quotation marks
+
+scripts$Characters = gsub("\\s*\\(.*\\)", "", scripts$Characters)  # Remove content within parentheses
+
+# Correct misspelled character name
+scripts$Characters = gsub("Soichrio", "Soichiro", scripts$Characters)
+
+scripts$Characters = trimws(scripts$Characters)  # Remove leading and trailing whitespace
+
+# Count the occurrences of each unique value in the 'Character' column while sorting 
+count(scripts, Characters, sort = TRUE)
+
+
+```
+
+
+
+
+
+```{r}
+
+# Count the occurrences of each unique value in the 'Character' column while sorting
+count(scripts,Episode.Name,sort = TRUE)
+
+```
+
+
+
+
+
+```{r}
+
+# Remove stage directions or parentheticals, i.e all words in []
+# Use gsub to remove text within square brackets
+scripts$Dialogue = gsub("\\[.*?\\]", "", scripts$Dialogue)
+
+# Trim any leading or trailing whitespace
+scripts$Dialogue = trimws(scripts$Dialogue)
+
+# Filter out rows where the Dialogue column is empty
+scripts = scripts %>% filter(Dialogue != "")
+
+```
+
+
 
 Text mining by removing punctuation, removing extra white space, making all characters lower case, remove numbers and remove common English words.
 
-```{r}
-v_stopwords = c(stopwords("english"), c("thats","weve","hes","theres","ive","im","will","can","cant","dont","youve","us",     "youre","youll","theyre","whats","didnt", "ill"))
-scripts.corpus=VCorpus(VectorSource(scripts$Dialog))
-scripts.corpus= scripts.corpus %>%
-  tm_map(removeNumbers) %>%
-  tm_map(removePunctuation) %>%
-  tm_map(stripWhitespace)  %>%
-  tm_map(content_transformer(tolower)) %>%
-  tm_map(removeWords,v_stopwords)  %>%
-  tm_map(removeWords,stopwords("SMART"))#%>%
-  #tm_map(stemDocument, language="english")
 
-tdm= TermDocumentMatrix(scripts.corpus) %>%
-  as.matrix()
-words=sort(rowSums(tdm),decreasing = TRUE)
-df=data.frame(word=names(words), freq=words)
-head(scripts)
+```{r}
+
+# Get default English stopwords and add additional custom stopwords
+v_stopwords = c(
+  stopwords("english"), # Default English stopwords
+  c("thats", "weve", "hes", "theres", "ive", "im", "will", "can", "cant", "dont", 
+    "youve", "us", "youre", "youll", "theyre", "whats", "didnt", "ill", "shes", 
+    "wasnt", "wouldnt", "couldnt", "shouldnt", "isnt", "arent", "werent", 
+    "havent", "hasnt", "hadnt", "wont", "wouldve", "couldve", "shouldve", 
+    "mightve", "mustve", "howd", "whered", "whyd", "whod", "whos", "youd", 
+    "theyd", "hed", "shed", "yall", "gotta", "gonna", "wanna", "lets", "ive", "aint", "yeah", "huh",          "hmm", "itll")
+)
 
 ```
 
 
 
-Extract tokens for bigrams
-```{r}
-tokenizer2 = function(x) NGramTokenizer(x, Weka_control(min=2, max=2))
 
-fbs.tdm = TermDocumentMatrix(scripts.corpus, control=list(tokenize=tokenizer2))
+
+
+```{r}
+
+# Create a VCorpus object named scripts.corpus from the Dialogue column of the scripts data frame
+scripts.corpus = VCorpus(VectorSource(scripts$Dialogue))
+
+# Update scripts.corpus by applying a series of text transformations using piping (%>%)
+
+scripts.corpus = scripts.corpus %>%
+  tm_map(removeNumbers) %>%  # Remove numbers from the corpus
+  tm_map(removePunctuation) %>%  # Remove punctuation marks from the corpus
+  tm_map(stripWhitespace) %>%  # Remove leading, trailing, and extra whitespace
+  tm_map(content_transformer(tolower)) %>%  # Convert all text to lowercase
+  tm_map(removeWords, v_stopwords) %>%  # Remove custom stopwords stored in v_stopwords
+  tm_map(removeWords, stopwords("SMART")) #%>%  # Remove SMART stopwords
+  # Skip stemming step to preserve original words
+  # tm_map(stemDocument, language = "english")
+
+
+```
+
+
+
+
+
+```{r}
+
+# Create a Term-Document Matrix (TDM) from the scripts.corpus and convert it to a matrix
+tdm = TermDocumentMatrix(scripts.corpus) %>%  # Create a Term-Document Matrix from scripts.corpus
+  as.matrix()  # Convert the Term-Document Matrix to a regular matrix
+
+# Calculate the total frequency of each word across all documents and sort in descending order
+words = sort(rowSums(tdm), decreasing = TRUE)
+
+# Create a data frame 'df' containing words and their frequencies
+df = data.frame(word = names(words), freq = words)
+
+```
+
+
+Extract tokens for bigrams
+
+
+```{r}
+
+# Define a function 'tokenizer2' to tokenize text into bigrams (2-word sequences)
+tokenizer2 = function(x) {
+  NGramTokenizer(x, Weka_control(min = 2, max = 2))
+}
+
+# Create a term-document matrix (TDM) using bigram tokenization
+fbs.tdm = TermDocumentMatrix(scripts.corpus, control = list(tokenize = tokenizer2))
+
+# Remove sparse terms (terms appearing in less than 0.1% of documents)
 fbs.tdm = removeSparseTerms(fbs.tdm, 0.999)
+
+# Convert the TDM to a regular matrix
 fbs.tdm = as.matrix(fbs.tdm)
+
+# Calculate word frequencies from the term-document matrix (fbs.tdm)
 word_freqs = rowSums(fbs.tdm)
-dm=as.list(word_freqs)
+
+# Convert the word frequencies into a list
+dm = as.list(word_freqs)
+
+# Create a data frame dm1 from the unlisted list dm, ensuring strings are treated as factors
 dm1 = data.frame(unlist(dm), stringsAsFactors = FALSE)
-setDT(dm1,keep.rowname=TRUE)
-setnames(dm1, 1, "term")
-setnames(dm1, 2, "freq")
-dm2=head(arrange(dm1, desc(freq)), n=20)
+
+# Set row names of dm1 as a column and rename columns
+setDT(dm1, keep.rownames = TRUE)  # Convert dm1 to a data.table and keep row names as a column
+setnames(dm1, 1, "term")  # Rename the first column to "term"
+setnames(dm1, 2, "freq")  # Rename the second column to "freq"
+
+# Extract top 20 terms by frequency, sorted in descending order
+dm2 = head(arrange(dm1, desc(freq)), n = 20)
+
 
 ```
 
 
 Trigram tokenizer for trigrams
-```{r}
-tokenizer3 = function(x) NGramTokenizer(x, Weka_control(min=3, max=3))
 
-fts.tdm = TermDocumentMatrix(scripts.corpus, control=list(tokenize=tokenizer3))
+
+```{r}
+
+# Define a function 'tokenizer3' to tokenize text into trigrams (3-word sequences)
+tokenizer3 = function(x) NGramTokenizer(x, Weka_control(min = 3, max = 3))
+
+# Create a term-document matrix (TDM) using trigram tokenization
+fts.tdm = TermDocumentMatrix(scripts.corpus, control = list(tokenize = tokenizer3))
+
+# Remove sparse terms (terms appearing in less than 0.1% of documents)
 fts.tdm = removeSparseTerms(fts.tdm, 0.999)
+
+# Convert the TDM to a regular matrix
 fts.tdm = as.matrix(fts.tdm)
+
+# Calculate the total frequency of each trigram across all documents
 word_freqs2 = rowSums(fts.tdm)
-dm3=as.list(word_freqs2)
+
+# Convert the word frequencies into a list
+dm3 = as.list(word_freqs2)
+
+# Create a data frame 'dm4' from the unlisted list 'dm3', ensuring strings are treated as factors
 dm4 = data.frame(unlist(dm3), stringsAsFactors = FALSE)
-setDT(dm4, keep.rownames = TRUE)
-setnames(dm4,1,"term")
-setnames(dm4, 2, "freq")
-dm5=head(arrange(dm4, desc(freq)), n=20)
+
+# Set row names of dm4 as a column and rename columns
+setDT(dm4, keep.rownames = TRUE)  # Convert dm4 to a data.table and keep row names as a column
+setnames(dm4, 1, "term")  # Rename the first column to "term"
+setnames(dm4, 2, "freq")  # Rename the second column to "freq"
+
+# Extract top 20 trigrams by frequency, sorted in descending order
+dm5 = head(arrange(dm4, desc(freq)), n = 20)
 
 ```
 
 
+Top 20 characters with the most dialogue
 
-Top 19 characters with the most dialog
+
 ```{r}
-scripts %>% 
-  count(Character.Name) %>%
-  arrange(desc(n)) %>% 
-  slice(1:19) %>%
-  mutate(Percentage=n/nrow(scripts)) %>%
-  ggplot(aes(x=reorder(Character.Name, Percentage), y=Percentage)) +
-  geom_bar(stat="identity", aes(fill=Percentage), show.legend=F) +
-  geom_label(aes(label=paste0(round(Percentage*100, 2), "%"))) +
-  scale_y_continuous(labels=scales::percent) +
-  scale_fill_gradient(low="#58D68D", high="#239B56") +
-  labs(x="Character", y="Dialogue Percentage", title="Most talkative characters in Death Note") +
-  coord_flip() +
-  theme_bw()
 
-image = image_read("C:/Users/Rachael/Desktop/Projects/Ryuk.jpg")
-grid.raster(image, x=0.865, y=0.305, height=0.4)
+# Calculate the count of dialogue lines by each character
+scripts %>%
+  count(Characters) %>%
+  arrange(desc(n)) %>%  # Arrange in descending order of dialogue counts
+  slice(1:20) %>%  # Select the top 19 characters by dialogue count
+  mutate(Percentage = n / nrow(scripts)) %>%  # Calculate the percentage of total dialogue
+  ggplot(aes(x = reorder(Characters, Percentage), y = Percentage)) +  # Plotting with reordered characters based on Percentage
+  geom_bar(stat = "identity", aes(fill = Percentage), show.legend = FALSE) +  # Bar plot with Percentage as fill
+  geom_label(aes(label = paste0(round(Percentage * 100, 2), "%"))) +  # Labels showing percentages
+  scale_y_continuous(labels = scales::percent) +  # Y-axis in percentage format
+  scale_fill_gradient(low = "#FFC0CB", high = "#FF69B4") +  # Gradient fill colors
+  labs(x = "Character", y = "Dialogue Percentage", title = "Most talkative characters in Death Note") +  # Axis and title labels
+  coord_flip() +  # Flip coordinates for horizontal bar chart
+  theme_bw()  # Apply a black and white theme
+
+# Load and display an image of Ryuk
+image = image_read("C:/Users/PC/Desktop/Portfolio/Sentiment Analysis/ryuk.png")  # Read Ryuk image file
+grid.raster(image, x = 0.6605, y = 0.4095, height = 0.6, width = 0.65)  # Display Ryuk image at specified coordinates and size
+
+
 ```
+
 
 OPINION MINING
+
+
 ```{r}
+
+# Tokenize dialogue from the 'scripts' data frame:
+# Create a new column 'dialogue' by converting 'Dialogue' to character,
+# then unnest this text column into individual words, storing them in 'tokens'.
 tokens = scripts %>%  
-  mutate(dialogue = as.character(scripts$Dialog)) %>%
-  unnest_tokens(word, dialogue)
+  mutate(dialogue = as.character(Dialogue)) %>%  # Convert 'Dialogue' to character format
+  unnest_tokens(word, dialogue)  # Split 'dialogue' into individual words and store in 'word'
+
+
 ```
 
 
 Use bing lexicon to compare words falling into the negative and positive categories
+
+
 ```{r}
+
+# Perform sentiment analysis using tokenized words:
+# 1. Join tokenized words with sentiment scores from 'bing'.
+# 2. Count occurrences of each word sentiment pair.
+# 3. Reshape data into a matrix where rows are words and columns are sentiments.
+# 4. Create a comparison cloud visualizing sentiment intensity with specified colors.
 tokens %>% 
-  inner_join(bing, "word") %>%
-  count(word, sentiment, sort=TRUE) %>% 
-  acast(word ~ sentiment, value.var = "n", fill=0) %>% 
-  comparison.cloud(colors=c("#991D1D", "#327CDE"), max.words = 100)
+  inner_join(bing, "word") %>%        # Join tokenized words with sentiment scores
+  count(word, sentiment, sort = TRUE) %>%  # Count occurrences of word-sentiment pairs
+  acast(word ~ sentiment, value.var = "n", fill = 0) %>%  # Reshape data for comparison cloud
+  comparison.cloud(colors = c("#991D1D", "#327CDE"), max.words = 100)  # Create comparison cloud
+
 
 ```
 
+
 NRC Lexicons
+
+
+
 ```{r}
-head(nrc)
+
+# Perform sentiment analysis using NRC lexicon:
+# 1. Join tokenized words with sentiment categories from 'nrc'.
+# 2. Count occurrences of each sentiment category.
+# 3. Create a bar plot visualizing sentiment frequencies.
+# 4. Overlay sentiment frequency labels on the bars.
+# 5. Add title and labels to the plot, and flip the coordinates for better readability.
 sentiments = tokens %>% 
-  inner_join(nrc, "word") %>%
-  count(sentiment, sort=TRUE) 
+  inner_join(nrc, "word") %>%        # Join tokenized words with sentiment categories from 'nrc'
+  count(sentiment, sort = TRUE)      # Count occurrences of each sentiment category
 
-ggplot(data=sentiments, aes(x=reorder(sentiment, n), y=n)) + 
-  geom_bar(stat="identity", aes(fill=sentiment), show.legend=FALSE) +
-  geom_label(label=sentiments$n) +
-  labs(x="Sentiment", y="Frequency", 
-       title="Death Note - Sentiment Analysis (NRC lexicon)") +
-  coord_flip() +
-  theme_bw()
+ggplot(data = sentiments, aes(x = reorder(sentiment, n), y = n)) + 
+  geom_bar(stat = "identity", aes(fill = sentiment), show.legend = FALSE) +  # Create a bar plot
+  geom_label(label = sentiments$n) +  # Overlay sentiment frequency labels
+  labs(x = "Sentiment", y = "Frequency", 
+       title = "Death Note Sentiment Analysis (NRC lexicon)") +  # Add title and labels
+  coord_flip() +  # Flip coordinates for horizontal bars
+  theme_bw()  # Apply a black and white theme to the plot
 
-image = image_read("C:/Users/Rachael/Desktop/Projects/Misa_and_Rem.jpg") 
-grid.raster(image, x=0.905, y=0.28, height=0.34)
+
 ```
 
 
 Top 10 frequent terms for each sentiment, NRC lexicon
-```{r}
- tokens %>% 
-  inner_join(nrc, "word") %>%
-  count(sentiment, word, sort=T) %>%
-  group_by(sentiment) %>%
-  arrange(desc(n)) %>%
-  slice(1:10) %>%
-  ggplot(aes(x=reorder(word, n), y=n)) +
-  geom_col(aes(fill=sentiment), show.legend=FALSE) +
-  theme(axis.text.x=element_text(angle=45, hjust=1)) +
-  facet_wrap(~sentiment, scales="free_y") +
-  labs(y="Frequency", x="Words", 
-       title="Most frequent terms for each sentiment (NRC lexicon)") +
-  coord_flip() +
-  theme_bw()
 
-image = image_read("C:/Users/Rachael/Desktop/Projects/death note book.png") 
-grid.raster(image, x=0.78, y=0.2, height=0.4)
+
+```{r}
+
+# Analyze sentiment-specific terms using NRC lexicon:
+# 1. Join tokenized words with sentiment categories from 'nrc'.
+# 2. Count occurrences of each sentiment-specific term.
+# 3. Group results by sentiment and arrange by frequency.
+# 4. Select top 10 frequent terms for each sentiment category.
+# 5. Create a grouped bar plot displaying top terms for each sentiment.
+# 6. Adjust x-axis text orientation and facet wrap for readability.
+tokens %>% 
+  inner_join(nrc, "word") %>%        # Join tokenized words with sentiment categories from 'nrc'
+  count(sentiment, word, sort = TRUE) %>%  # Count occurrences of each sentiment-specific term
+  group_by(sentiment) %>%            # Group by sentiment category
+  arrange(desc(n)) %>%               # Arrange by frequency in descending order
+  slice(1:10) %>%                    # Select top 10 frequent terms for each sentiment
+  ggplot(aes(x = reorder(word, n), y = n)) +  # Create a ggplot object
+  geom_col(aes(fill = sentiment), show.legend = FALSE) +  # Grouped bar plot with sentiment-specific terms
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +  # Adjust x-axis text orientation
+  facet_wrap(~ sentiment, scales = "free_y") +  # Facet wrap by sentiment category
+  labs(y = "Frequency", x = "Words", 
+       title = "Most frequent terms for each sentiment (NRC lexicon)") +  # Add title and labels
+  coord_flip() +  # Flip coordinates for horizontal bars
+  theme_bw()  # Apply a black and white theme to the plot
 
 ```
+
 
 Sentiment Analysis for the top 10 characters with the most dialogue, nrc lexicon
-```{r}
-tokens %>%
-  filter(Character.Name %in% c("Light","L","Misa","Soichiro","Near", "Aizawa","Ryuk", "Higuchi","Rem","Takada")) %>%
-  inner_join(nrc, "word") %>%
-  count(Character.Name, sentiment, sort=TRUE) %>%
-  ggplot(aes(x=sentiment, y=n)) +
-  geom_col(aes(fill=sentiment), show.legend=FALSE) +
-  facet_wrap(~Character.Name, scales="free_x") +
-  labs(x="Sentiment", y="Frequency", 
-       title="Sentiment Analysis for each character (NRC lexicon)") +
-  coord_flip() +
-  theme_bw()
 
-image = image_read("C:/Users/Rachael/Desktop/Projects/death note book.png") 
-grid.raster(image, x=0.78, y=0.2, height=0.4)
+
+```{r}
+
+# Step 1: Calculate the count of dialogue lines by each character
+top_characters = scripts %>%
+  count(Characters) %>%
+  arrange(desc(n)) %>%  
+  slice(1:10)  # Select the top 10 characters by dialogue count
+
+# Step 2: Filter tokens to include only the dialogue from the top 10 characters
+filtered_tokens = tokens %>%
+  filter(Characters %in% top_characters$Characters)
+
+# Step 3: Perform sentiment analysis using the NRC lexicon
+sentiments = filtered_tokens %>%
+  inner_join(nrc, by = c("word" = "word")) %>%
+  count(Characters, sentiment, sort = TRUE)
+
+# Step 4: Plot sentiment analysis for the top 10 characters
+ggplot(data = sentiments, aes(x = sentiment, y = n)) +
+  geom_col(aes(fill = sentiment), show.legend = FALSE) +
+  facet_wrap(~ Characters, scales = "free_x") +
+  labs(x = "Sentiment", y = "Frequency", 
+       title = "Sentiment Analysis for Top 10 Characters (NRC lexicon)") +
+  coord_flip() +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))  # Rotate x-axis labels for better readability
 
 
 ```
+
+
+
+
+
+```{r}
+
+# Step 1: Calculate the count of dialogue lines by each character
+top_characters <- scripts %>%
+  count(Characters) %>%
+  arrange(desc(n)) %>%  
+  slice(1:10)  # Select the top 10 characters by dialogue count
+
+# Step 2: Filter tokens to include only the dialogue from the top 10 characters
+filtered_tokens <- tokens %>%
+  filter(Characters %in% top_characters$Characters)
+
+# Step 3: Perform sentiment analysis for each character
+sentiments = filtered_tokens %>%
+  inner_join(nrc, by = c("word" = "word")) %>%
+  count(Characters, sentiment, sort = TRUE) %>%
+  group_by(Characters) %>%
+  slice_max(n, n = 10)  # Select top 10 sentiments for each character
+
+# Step 4: Plot sentiment analysis for the top 10 characters
+ggplot(data = sentiments, aes(x = reorder(sentiment, n), y = n)) +
+  geom_col(aes(fill = sentiment), show.legend = FALSE) +
+  facet_wrap(~ Characters, scales = "free_x") +
+  labs(x = "Sentiment", y = "Frequency", 
+       title = "Top 10 Sentiments for Top 10 Characters (NRC lexicon)") +
+  coord_flip() +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))  # Rotate x-axis labels for better readability
+
+
+```
+
 
 AFINN LEXICON
 ```{r}
-plot = tokens %>% 
-  inner_join(afinn, "word") %>% 
-  count(value, sort=T) %>%
-  ggplot(aes(x=value, y=n)) +
-  geom_bar(stat="identity", aes(fill=n), show.legend=FALSE, width=0.5) +
-  geom_label(aes(label=n)) +
-  scale_fill_gradient(low="thistle1", high="thistle4") +
-  scale_x_continuous(breaks=seq(-3, 4, 1)) +
-  labs(x="Score", y="Frequency", title="Word distribution (AFINN lexicon)") +
-  theme_bw() 
 
+# Perform sentiment analysis using the AFINN lexicon
+plot <- tokens %>%
+  inner_join(afinn, by = "word") %>%
+  count(value, sort = TRUE) %>%
+  ggplot(aes(x = as.factor(value), y = n)) +
+  geom_bar(stat = "identity", aes(fill = n), width = 0.7, show.legend = FALSE) +  # Adjusted width
+  geom_text(aes(label = n), vjust = -0.5, size = 3, color = "black") +  # Add labels on top of bars
+  scale_fill_gradient(low = "#FFC0CB", high = "#FF69B4") +  # Pink color gradient
+  scale_x_discrete(breaks = seq(-5, 5, by = 1)) +  # Adjust x-axis breaks
+  labs(x = "Sentiment Score", y = "Frequency", title = "Word Distribution (AFINN Lexicon)") +  # Axis labels and title
+  theme_bw() +  # Use a clean white background
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),  # Rotate x-axis labels for better readability
+        panel.grid.major = element_line(color = "gray", linetype = "dashed"),  # Add dashed gridlines
+        panel.grid.minor = element_blank(),  # Remove minor gridlines
+        panel.background = element_rect(fill = "white"))  # White background
 
-img = "C:/Users/Rachael/Desktop/Projects/L.png" 
-lab = ""  
-pos = list(w=1, h=0.75, x=0.5, y=0.5)
-meme(img, lab, "L.png", inset=plot, inset_pos=pos)
-meme = image_read("L.png")
-plot(meme)
+# Display the plot
+print(plot)
+
 
 ```
+
+
 
 Word cloud
+
+
 ```{r}
-image.colors=c("#952d40", "#d87eb1", "#7b7b7b","#6a1d31","#707f8a")
-image.background="#000000"
-wordcloud2(df,color = rep_len(image.colors, nrow(df)), backgroundColor = image.background, fontFamily="DM Sans", size=2.5, minSize=5, rotateRatio=0)
+
+# Define custom colors for the word cloud
+image.colors <- c("#952d40", "#d87eb1", "#7b7b7b", "#6a1d31", "#707f8a")
+
+# Set background color for the word cloud
+image.background <- "#000000"
+
+# Generate the word cloud using wordcloud2
+wordcloud2(df,
+           color = rep_len(image.colors, nrow(df)),
+           backgroundColor = image.background,
+           fontFamily = "DM Sans",
+           size = 2.5,
+           minSize = 5,
+           rotateRatio = 0)
+
+
 ```
 
 
-We are going to compute the most repeated bigrams and trigrams. A bigram is a sequence of two adjacent elements from a string of tokens, which are typically letters, syllables, or words. A trigram is the same but with three adjacent elements
+
+
+
 ```{r}
+# Define custom colors for the word cloud
+image.colors <- c("#952d40", "#d87eb1", "#7b7b7b", "#6a1d31", "#707f8a")
 
+# Set background color for the word cloud
+image.background <- "#000000"
 
-plot1 = ggplot(data=dm2, aes(x=reorder(term, freq), y=freq)) +  
-  geom_bar(stat="identity", fill="#00FF00", colour="black") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 
-  labs(x="Bigram", y="Frequency") +
-  coord_flip() + 
-  ggtitle("Bigram for Death Note") 
+# Generate the word cloud using wordcloud2
+wordcloud <- wordcloud2(df,
+                        color = rep_len(image.colors, nrow(df)),
+                        backgroundColor = image.background,
+                        fontFamily = "DM Sans",
+                        size = 2.5,
+                        minSize = 5,
+                        rotateRatio = 0)
 
-plot2 = ggplot(data=dm5, aes(x=reorder(term, freq), y=freq)) +  
-  geom_bar(stat="identity", fill="#FF9999", colour="black") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 
-  labs(x="Trigram", y="Frequency") +
-  coord_flip() + 
-  ggtitle("Trigram for Death Note") 
+# Save the word cloud as an HTML file first
+saveWidget(wordcloud, "C:/Users/PC/Desktop/Portfolio/Sentiment Analysis/wordcloud.html", selfcontained = TRUE)
 
+# Use webshot to save the word cloud as a PNG file
+webshot("C:/Users/PC/Desktop/Portfolio/Sentiment Analysis/wordcloud.html", file = "C:/Users/PC/Desktop/Portfolio/Sentiment Analysis/wordcloud.png", delay = 60)
 
-# Subplot
-grid.arrange(plot1, plot2, ncol=2, top="Bigrams and Trigrams - Death Note")
 ```
+
+
 
 Network of Bigrams
-```{r}
-bigrams_separated = dm2 %>%
-                    separate(term, c("word1", "word2"), sep=" ")
 
-bigrams_graph = bigrams_separated %>%
-                filter(freq>3) %>%
-                graph_from_data_frame() 
-  
+
+```{r}
+
+# Separate the bigrams into two columns
+bigrams_separated <- dm2 %>%
+  separate(term, c("word1", "word2"), sep = " ")
+
+# Filter out bigrams with frequency greater than 3 and create a graph object
+bigrams_graph <- bigrams_separated %>%
+  filter(freq > 3) %>%
+  graph_from_data_frame(directed = TRUE)  # Ensure the graph is directed for arrows
+
+# Set seed for reproducibility
 set.seed(2016)
 
-a = grid::arrow(type="closed", length=unit(0.15, "inches"))
+# Define arrow specifications for the edges
+arrow <- arrow(type = "closed", length = unit(0.15, "inches"))
 
-ggraph(bigrams_graph, layout="fr") +
-  geom_edge_link(aes(edge_alpha=freq), show.legend = FALSE, arrow=a, end_cap=circle(0.07, 'inches')) +
-  geom_node_point(color="lightblue", size=5) +
-  geom_node_text(aes(label=name), vjust=1, hjust=1) +
-  theme_void()
+# Create the graph using ggraph, with enhanced aesthetics
+ggraph(bigrams_graph, layout = "fr") +
+  geom_edge_link(aes(alpha = freq, color = factor(freq)), show.legend = FALSE, arrow = arrow, end_cap = circle(0.1, 'inches')) +
+  geom_node_point(color = "#4A90E2", size = 5) +  # Blue nodes
+  geom_node_text(aes(label = name), vjust = 1, hjust = 1, repel = TRUE, size = 6) +  # Larger labels with repelling
+  theme_graph(background = "#FFFFFF", base_family = "Arial", base_size = 12) +  # Dark background and Arial font
+  labs(title = "Bigram Network in Death Note") +  # Title
+  scale_alpha_continuous(range = c(0.3, 1)) +  # Adjust transparency range
+  scale_color_manual(values = c("#FF9999", "#FFC0CB", "#C0C0C0"), guide = FALSE) +  # Edge color scale
+  theme(plot.title = element_text(hjust = 0.5, size = 18, face = "bold", color = "#FFFFFF"))  # Title formatting
+
 ```
 
 
